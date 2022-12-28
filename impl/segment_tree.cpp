@@ -11,29 +11,31 @@ void build(int a[], int v, int tl, int tr) {
   if (tl == tr) {
     t[v] = a[tl];
   } else {
-  // recursively go down
+    // recursively go down
     int tm = (tl + tr) / 2;
-   build(a, v * 2, tl, tm);
+    build(a, v * 2, tl, tm);
     build(a, v * 2 + 1, tm + 1, tr);
     t[v] = t[v * 2] + t[v * 2 + 1];
   }
 }
 
-void build(int a[]) { 
+void build(int a[]) {
   // start from root
-  build(a, 1, 0, n - 1); 
+  build(a, 1, 0, n - 1);
 }
 
 int sum(int v, int tl, int tr, int l, int r) {
-  if (tl > r || tr < l) return 0;
-  if (l <= tl && tr <= r) return t[v];
+  if (tl > r || tr < l)
+    return 0;
+  if (l <= tl && tr <= r)
+    return t[v];
   int tm = (tl + tr) / 2;
   return sum(v * 2, tl, tm, l, r) + sum(v * 2 + 1, tm + 1, tr, l, r);
 }
 
-int sum(int l, int r) { 
+int sum(int l, int r) {
   // start from root
-  return sum(1, 0, n - 1, l, r); 
+  return sum(1, 0, n - 1, l, r);
 }
 
 void update(int v, int tl, int tr, int pos, int val) {
@@ -50,9 +52,9 @@ void update(int v, int tl, int tr, int pos, int val) {
   }
 }
 
-void update(int pos, int val) { 
+void update(int pos, int val) {
   // start from root
-  update(1, 0, n - 1, pos, val); 
+  update(1, 0, n - 1, pos, val);
 }
 
 int main() {
