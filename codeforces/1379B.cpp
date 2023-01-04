@@ -49,57 +49,25 @@ void setIO(string s = "") {
   }
 }
 
-int n;
-vector<bool> seen;
-vector<vector<int>> in_edges;
-vector<int> a, v;
-
-
-void mark_seen(int x) {
-  if (seen[x]) return;
-  seen[x] = true;
-  for (int y : in_edges[x]) {
-    mark_seen(y);
-  }
-}
-
-int min_cycle_edge(int node) {
-  // we dont have to be at the "head" of the graph
-  // modified version of floyd's hare and tortoise algorithm
-  int x = node, y = node;
-  do {
-    x = a[x];
-    y = a[a[y]];
-  } while (x != y);
-  // move first pointer until we encounter the second
-  // to iterate through the entire cycle
-  int min_edge = INT_MAX;
-  do {
-    min_edge = min(min_edge, v[x]);
-    x = a[x];
-  } while (x != y);
-  // has to be within the cycle
-  // otherwise, doesn't bubble up to every node in the component
-  mark_seen(x);
-  return min_edge;
-}
-
 int main() {
-  setIO();
-  cin >> n;
-  ll ans = 0;
-  seen.assign(n + 1, false);
-  a.resize(n + 1);
-  v.resize(n + 1);
-  in_edges.resize(n + 1);
-  for (int i = 1; i <= n; i++) {
-    cin >> a[i] >> v[i];
-    ans += v[i];
-    in_edges[a[i]].pb(i);
+  int t;
+  cin >> t;
+  while (t--) {
+    ll l, r, m;
+    cin >> l >> r >> m;
+    for (ll a = l; a <= r; a++) {
+      ll mod = m % a;
+      // go down to multiple of a below
+      if (mod <= r - l && (m - mod) / a > 0) {
+        cout << a << " " << l + mod << " " << l << endl;
+        break;
+      }
+      // go up to multiple of a above
+      if ((a - mod) <= r - l) {
+        cout << a << " " << l << " " << l + (a - mod)  << endl;
+        break;
+      }
+    }
   }
-  for (int i = 1; i <= n; i++) {
-    if (!seen[i]) ans -= min_cycle_edge(i);
-  }
-  cout << ans << endl;
   return 0;
 }

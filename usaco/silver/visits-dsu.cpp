@@ -49,56 +49,42 @@ void setIO(string s = "") {
   }
 }
 
-int n;
-vector<bool> seen;
-vector<vector<int>> in_edges;
-vector<int> a, v;
+struct DSU {
+	vector<int> e;
+	void init(int N) { e = vector<int>(N, -1); }
+	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	bool unite(int x, int y) {
+		x = get(x), y = get(y);
+		if (x == y) return 0;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y];
+		e[y] = x;
+		return 1;
+	}
+};
 
-
-void mark_seen(int x) {
-  if (seen[x]) return;
-  seen[x] = true;
-  for (int y : in_edges[x]) {
-    mark_seen(y);
-  }
-}
-
-int min_cycle_edge(int node) {
-  // we dont have to be at the "head" of the graph
-  // modified version of floyd's hare and tortoise algorithm
-  int x = node, y = node;
-  do {
-    x = a[x];
-    y = a[a[y]];
-  } while (x != y);
-  // move first pointer until we encounter the second
-  // to iterate through the entire cycle
-  int min_edge = INT_MAX;
-  do {
-    min_edge = min(min_edge, v[x]);
-    x = a[x];
-  } while (x != y);
-  // has to be within the cycle
-  // otherwise, doesn't bubble up to every node in the component
-  mark_seen(x);
-  return min_edge;
-}
+// tuple: vertex value, two nodes that are connected
+typedef tuple<int, int, int> edge;
 
 int main() {
   setIO();
+  int n;
   cin >> n;
-  ll ans = 0;
-  seen.assign(n + 1, false);
-  a.resize(n + 1);
-  v.resize(n + 1);
-  in_edges.resize(n + 1);
+  vector<edge> edges;
   for (int i = 1; i <= n; i++) {
-    cin >> a[i] >> v[i];
-    ans += v[i];
-    in_edges[a[i]].pb(i);
+    int a, v;
+    cin >> a >> v;
+    edges.pb({v, i, a});
   }
-  for (int i = 1; i <= n; i++) {
-    if (!seen[i]) ans -= min_cycle_edge(i);
+  sort(all(edges), greater<edge>());
+  DSU dsu;
+  dsu.init(n + 1);
+  ll ans = 0;
+  // find maximum spanning forest
+  for (auto [v, x, y] : edges) {
+    if (dsu.unite(x, y)) {
+      ans += v;
+    }
   }
   cout << ans << endl;
   return 0;
