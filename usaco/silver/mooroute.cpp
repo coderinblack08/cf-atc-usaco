@@ -49,53 +49,28 @@ void setIO(string s = "") {
   }
 }
 
-const int MOD = 998244353;
-
-int mod_inverse(int a) {
-  int b = MOD, u = 1, v = 0;
-  while (b) {
-    int t = a / b;
-    a -= t * b; swap(a, b);
-    u -= t * v; swap(u, v);
-  }
-  u %= MOD;
-  if (u < 0) u += MOD;
-  return u;
-}
-
 int main() {
-  int q;
-  cin >> q;
-
-  queue<pair<ll, ll>> F;
-  ll c_factor = 0;
-  ll x_factor = 1;
-
-  while (q--) {
-    int t;
-    cin >> t;
-    if (t == 0) {
-      ll a, b;
-      cin >> a >> b;
-
-      c_factor = (a * c_factor + b) % MOD;
-      x_factor = (a * x_factor) % MOD;
-
-      F.push(mp(a, b));
+  setIO();
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  for (int i = 0; i < n; i++) {
+    cin >> a[i];
+  }
+  // why?
+  a.pb(0);
+  string route = "";
+  int i = 0;
+  while (!(i == 0 && a[i] == 0)) {
+    while (a[i] > 0) {
+      route += "R";
+      a[i++]--;
     }
-    if (t == 1) {
-      auto [a, b] = F.front();
-      x_factor = (x_factor * mod_inverse(a)) % MOD;
-      c_factor = (c_factor - b * x_factor) % MOD;
-      F.pop();
-    }
-    if (t == 2) {
-      ll x;
-      cin >> x;
-      if (F.empty()) cout << x << endl;
-      else cout << (c_factor + x * x_factor) % MOD << endl;
+    while (i > 0 && (a[i - 1] > 1 || a[i] == 0)) {
+      route += "L";
+      a[--i]--;
     }
   }
-
+  cout << route;
   return 0;
 }

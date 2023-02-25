@@ -49,53 +49,76 @@ void setIO(string s = "") {
   }
 }
 
-const int MOD = 998244353;
+int n, k;
+int board[101][11];
+bool visited[101][11];
+vector<pi> comp[101 * 11];
 
-int mod_inverse(int a) {
-  int b = MOD, u = 1, v = 0;
-  while (b) {
-    int t = a / b;
-    a -= t * b; swap(a, b);
-    u -= t * v; swap(u, v);
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+
+void dfs(int x, int y, int color, int cp) {
+  if (x < 0 || x >= n || y < 0 || y >= 10) return;
+  if (visited[x][y]) return;
+  if (board[x][y] != color) return;
+  visited[x][y] = true;
+  comp[cp].pb(mp(x, y));
+  for (int i = 0; i < 4; i++) {
+    dfs(x + dx[i], y + dy[i], color, cp);
   }
-  u %= MOD;
-  if (u < 0) u += MOD;
-  return u;
+}
+
+bool move() {
+  memset(visited, false, sizeof(visited));
+  // find connected components
+  int c = 0;
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < 10; j++)
+      if (!visited[i][j] && board[i][j] != 0) dfs(i, j, board[i][j], c++);
+  vi v;
+  for (int i = 0; i < c; i++) {
+    if (comp[i].size() >= k) {
+      v.pb(i);
+    }
+  }
+  if (v.size() == 0) return false;
+  for (auto x : v)
+    for (auto y : comp[x]) board[y.f][y.s] = 0;
+
+  for (int c = 0; c < 10; c++) {
+    queue<int> q;
+    for (int r = n - 1; r >= 0; r--) {
+      if (board[r][c] != 0) q.push(board[r][c]);
+    }
+    for (int r = n - 1; r >= 0; r--) {
+      if (q.empty()) {
+        board[r][c] = 0;
+      } else {
+        board[r][c] = q.front();
+        q.pop();
+      }
+    }
+  }
+  for (int i = 0; i < c; i++) comp[i].clear();
+  return true;
 }
 
 int main() {
-  int q;
-  cin >> q;
-
-  queue<pair<ll, ll>> F;
-  ll c_factor = 0;
-  ll x_factor = 1;
-
-  while (q--) {
-    int t;
-    cin >> t;
-    if (t == 0) {
-      ll a, b;
-      cin >> a >> b;
-
-      c_factor = (a * c_factor + b) % MOD;
-      x_factor = (a * x_factor) % MOD;
-
-      F.push(mp(a, b));
-    }
-    if (t == 1) {
-      auto [a, b] = F.front();
-      x_factor = (x_factor * mod_inverse(a)) % MOD;
-      c_factor = (c_factor - b * x_factor) % MOD;
-      F.pop();
-    }
-    if (t == 2) {
-      ll x;
-      cin >> x;
-      if (F.empty()) cout << x << endl;
-      else cout << (c_factor + x * x_factor) % MOD << endl;
+  setIO("mooyomooyo");
+  cin >> n >> k;
+  for (int i = 0; i < n; i++) {
+    string s;
+    cin >> s;
+    for (int j = 0; j < 10; j++) {
+      board[i][j] = s[j] - '0';
     }
   }
-
+  while(move());
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < 10; j++) {
+      cout << board[i][j];
+    }
+    cout << endl;
+  }
   return 0;
 }

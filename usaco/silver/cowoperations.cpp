@@ -2,7 +2,6 @@
 using namespace std;
 
 using ll = long long;
-
 using vi = vector<int>;
 #define pb push_back
 #define all(x) begin(x), end(x)
@@ -49,53 +48,48 @@ void setIO(string s = "") {
   }
 }
 
-const int MOD = 998244353;
+/*
+OW -> WCCO -> WO (you can swap neighborring letters)
+you can rearrange the word however you want
 
-int mod_inverse(int a) {
-  int b = MOD, u = 1, v = 0;
-  while (b) {
-    int t = a / b;
-    a -= t * b; swap(a, b);
-    u -= t * v; swap(u, v);
-  }
-  u %= MOD;
-  if (u < 0) u += MOD;
-  return u;
-}
+we can test based on parity because order doens't matter
+*/
 
 int main() {
+  setIO();
+  string s;
   int q;
-  cin >> q;
-
-  queue<pair<ll, ll>> F;
-  ll c_factor = 0;
-  ll x_factor = 1;
-
+  cin >> s >> q;
+  int n = sz(s);
+  vi c(n + 1, 0), o(n + 1, 0), w(n + 1, 0);
+  for (int i = 0; i < n; i++) {
+    c[i + 1] = c[i] + (s[i] == 'C');
+    o[i + 1] = o[i] + (s[i] == 'O');
+    w[i + 1] = w[i] + (s[i] == 'W');
+  }
   while (q--) {
-    int t;
-    cin >> t;
-    if (t == 0) {
-      ll a, b;
-      cin >> a >> b;
+    int l, r;
+    cin >> l >> r;
+    int C = (c[r] - c[l - 1]) % 2;
+    int O = (o[r] - o[l - 1]) % 2;
+    int W = (w[r] - w[l - 1]) % 2;
 
-      c_factor = (a * c_factor + b) % MOD;
-      x_factor = (a * x_factor) % MOD;
+    // (C O W)
+    // (0 0 0) -> 0
+    // (1 0 0) -> 1
+    // (0 1 0) -> 0
+    // (0 0 1) -> 0
+    // (1 1 0) -> 0
+    // (1 0 1) -> 0
+    // (0 1 1) -> 1
+    // (1 1 1) -> 0
 
-      F.push(mp(a, b));
-    }
-    if (t == 1) {
-      auto [a, b] = F.front();
-      x_factor = (x_factor * mod_inverse(a)) % MOD;
-      c_factor = (c_factor - b * x_factor) % MOD;
-      F.pop();
-    }
-    if (t == 2) {
-      ll x;
-      cin >> x;
-      if (F.empty()) cout << x << endl;
-      else cout << (c_factor + x * x_factor) % MOD << endl;
+    if ((C == 1 && O == 0 && W == 0) || (C == 0 && O == 1 && W == 1)) {
+      cout << "Y";
+    } else {
+      cout << "N";
     }
   }
-
+  cout << "\n";
   return 0;
 }

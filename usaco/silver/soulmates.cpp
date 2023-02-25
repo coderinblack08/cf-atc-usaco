@@ -34,6 +34,7 @@ void __print(const T &x) {int f = 0; cerr << '{'; for (auto &i: x) cerr << (f++ 
 void _print() {cerr << "]\n";}
 template <typename T, typename... V>
 void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
+
 #ifndef ONLINE_JUDGE
 #define debug(x...) cerr << "[" << #x << "] = ["; _print(x)
 #else
@@ -49,53 +50,41 @@ void setIO(string s = "") {
   }
 }
 
-const int MOD = 998244353;
+// intuition for solution?
 
-int mod_inverse(int a) {
-  int b = MOD, u = 1, v = 0;
-  while (b) {
-    int t = a / b;
-    a -= t * b; swap(a, b);
-    u -= t * v; swap(u, v);
+int solve() {
+  ll a, b;
+  cin >> a >> b;
+  if (a == b) {
+    return 0;
   }
-  u %= MOD;
-  if (u < 0) u += MOD;
-  return u;
+  vector<ll> div1 = {a}, div2 = {b};
+  while (a > 1) {
+    if (a % 2) a++;
+    else a /= 2;
+    div1.pb(a);
+  }
+  div1.pb(1);
+  while (b > 1) {
+    if (b % 2) b--;
+    else b /= 2;
+    div2.pb(b);
+  }
+  div2.pb(1);
+  ll ans = LLONG_MAX;
+  for (int i = 0; i < sz(div1); i++) {
+    for (int j = 0; j < sz(div2); j++) {
+      if (div1[i] < div2[j]) {
+        ans = min(ans, div2[j] - div1[i] + i + j);
+      }
+    }
+  }
+  return ans;
 }
 
 int main() {
-  int q;
-  cin >> q;
-
-  queue<pair<ll, ll>> F;
-  ll c_factor = 0;
-  ll x_factor = 1;
-
-  while (q--) {
-    int t;
-    cin >> t;
-    if (t == 0) {
-      ll a, b;
-      cin >> a >> b;
-
-      c_factor = (a * c_factor + b) % MOD;
-      x_factor = (a * x_factor) % MOD;
-
-      F.push(mp(a, b));
-    }
-    if (t == 1) {
-      auto [a, b] = F.front();
-      x_factor = (x_factor * mod_inverse(a)) % MOD;
-      c_factor = (c_factor - b * x_factor) % MOD;
-      F.pop();
-    }
-    if (t == 2) {
-      ll x;
-      cin >> x;
-      if (F.empty()) cout << x << endl;
-      else cout << (c_factor + x * x_factor) % MOD << endl;
-    }
-  }
-
+  setIO();
+  int t; cin >> t;
+  while (t--) cout << solve() << "\n";
   return 0;
 }
